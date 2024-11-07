@@ -1,0 +1,255 @@
+chmod -R 777 /../../
+
+sudo cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfgBAK
+sudo cp /boot/efi/EFI/fedora/grub.cfg /boot/efi/EFI/fedora/grub.cfgBAK
+sudo rm /boot/efi/EFI/fedora/grub.cfg
+sudo rm /boot/grub2/grub.cfg
+sudo dnf reinstall shim-* grub2-efi-* grub2-common
+sudo grub2-mkconfig -o /etc/grub2.cfg
+sudo grub2-mkconfig -o /etc/grub2-efi.cfg
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+reboot
+#----------------------------
+#--alterar o SWAP------------
+sudo nano /proc/sys/vm/swappiness
+#alterar para 0, default = 60
+#----------------------------
+
+#----add user to group - to recognize arduino usb------
+sudo usermod -aG dialout $USER
+sudo usermod -a -G dialout primifed
+# ----- or run this every reboot:
+sudo chmod a+rw /dev/ttyUSB0
+#----------------------------
+
+#----set volume to go over 100%----------------------
+gsettings set org.gnome.desktop.sound allow-volume-above-100-percent 'true'
+#----------------------------
+
+sudo dnf update -y && sudo dnf upgrade --refresh -y && sudo dnf upgrade -y && sudo flatpak update -y && sudo dnf groupupdate core -y && sudo dnf install kernel-devel-matched && sudo dnf autoremove -y && sudo fwupdmgr get-updates
+
+sudo dnf update -y && sudo dnf upgrade --refresh -y && sudo dnf upgrade -y && sudo flatpak update -y && sudo rm -rfv /var/tmp/flatpak-cache-* && rm -rfv ~/.cache/flatpak/* && sudo flatpak uninstall --unused -y && sudo flatpak repair && sudo dnf groupupdate core -y && sudo dnf install kernel-devel-matched && sudo dnf autoremove -y 
+
+sudo dnf update -y && sudo dnf upgrade --refresh -y && sudo dnf upgrade -y && sudo flatpak update -y && sudo rm -rfv /var/tmp/flatpak-cache-* && rm -rfv ~/.cache/flatpak/* && sudo flatpak uninstall --unused -y && sudo flatpak repair && sudo dnf groupupdate core -y && sudo dnf install kernel-devel-matched && sudo dnf autoremove -y && sudo dracut --force --no-hostonly && sudo fwupdmgr refresh --force && sudo fwupdmgr get-updates && sudo fwupdmgr update
+
+sudo fwupdmgr refresh --force
+sudo fwupdmgr get-updates
+sudo fwupdmgr update
+#----------------------------
+
+#--install flatpak-------------
+flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+flatpak remote-add --if-not-exists fedora oci+https://registry.fedoraproject.org
+
+sudo dnf install https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm -y
+sudo dnf install https://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
+sudo dnf upgrade --refresh
+sudo dnf groupupdate core
+#----------------------------
+
+#--install NFS support to nautilus-------------
+sudo dnf install gvfs-nfs.x86_64 -y
+
+#--install nvidia 390-------------gtx860m  470
+sudo dnf install nvidia-gpu-firmware.noarch -y
+sudo dnf install akmod-nvidia-390xx.x86_64 -y
+sudo dnf install kmod-nvidia-390xx.x86_64 -y
+sudo dnf install xorg-x11-drv-nvidia-390xx-cuda.x86_64 -y
+
+sudo dnf autoremove akmod-nvidia-390xx.x86_64 -y
+sudo dnf autoremove kmod-nvidia-390xx.x86_64 -y
+sudo dnf autoremove xorg-x11-drv-nvidia-390xx-cuda.x86_64 -y
+
+sudo dnf install vulkan-loader vulkan-loader.i686
+
+#--install intel-HD-------------
+sudo dnf install libva-intel-driver.x86_64 -y
+sudo dnf install libva-intel-hybrid-driver.x86_64 -y
+sudo dnf install xorg-x11-drv-intel.x86_64 -y
+#----------------------------
+
+#--para trocar para a gpu intel-------------envycontrol
+git clone https://github.com/geminis3/envycontrol.git
+sudo dnf install python3-pip
+cd envycontrol
+sudo pip3 install .
+sudo envycontrol -s integrated
+sudo envycontrol -s hybrid
+reboot
+#instalar a extensão "GPU profile selector"
+#----------------------------
+
+#--para trocar para a gpu intel-------------https://gitlab.com/asus-linux/supergfxctl
+sudo dnf install gcc-c++ libX11-devel alsa-lib-devel systemd-devel -y
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+git clone https://gitlab.com/asus-linux/supergfxctl.git
+cd supergfxctl
+make && sudo make install
+sudo systemctl enable supergfxd.service --now
+sudo usermod -a -G users $USER
+#----------------------------
+
+#--instalar seletor de gpu-------------
+#--procurar por "Super Graphics Control" na loja gnome
+sudo dnf install -y pkg-config libusb-1.0-0-dev libftdi1-dev
+sudo yum install -y rust-libudev-devel.noarch
+sudo dnf install -y gcc-c++ libX11-devel alsa-lib-devel systemd-devel
+sudo dnf install -y wayland-devel libxkbcommon-devel
+sudo sed -i 's/#KillUserProcesses=no/KillUserProcesses=yes/' /etc/systemd/logind.conf
+sudo dnf upgrade && sudo dnf install curl git @development_tools
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+source ~/.cargo/env
+git clone https://gitlab.com/asus-linux/supergfxctl.git
+cd supergfxctl
+make && sudo make install
+sudo systemctl enable supergfxd.service --now
+sudo usermod -a -G users $USER
+#----------------------------
+
+#sudo flatpak install com.google.Chrome -y
+#sudo dnf remove fedora-chromium-config -y
+
+sudo dnf install gnome-tweak-tool -y
+flatpak install flathub org.gnome.Extensions -y
+flatpak install flathub com.mattjakeman.ExtensionManager -y
+sudo dnf install chrome-gnome-shell -y
+#----------------------------
+
+#--app indicador-------------
+sudo dnf install gnome-shell-extension-appindicator -y
+sudo dnf install gnome-extensions-app -y
+	#depois ativar a extensão no gnome extensions 
+#----------------------------
+
+sudo dnf install -y unzip p7zip p7zip-plugins unrar
+flatpak install flathub com.transmissionbt.Transmission -y
+gsettings set org.gnome.desktop.interface show-battery-percentage true
+sudo dnf install -y 'google-roboto*' 'mozilla-fira*' fira-code-fonts
+sudo dnf install tlp tlp-rdw -y
+
+sudo dnf install dnf-plugins-core -y
+sudo dnf copr enable rockowitz/ddcutil -y
+
+sudo dnf install ddcutil -y
+sudo usermod $USER -aG i2c
+sudo groupadd --system i2c
+sudo cp /usr/share/ddcutil/data/45-ddcutil-i2c.rules /etc/udev/rules.d
+sudo chmod a+rw /dev/i2c-*
+modprobe i2c-dev
+ddcutil capabilities | grep "Feature: 10"
+sudo touch /etc/modules-load.d/i2c.conf
+sudo echo "i2c-dev" >> sudo /etc/modules-load.d/i2c.conf
+
+sudo dnf install -y timeshift
+sudo dnf install neofetch -y
+sudo dnf install htop -y
+#sudo dnf install kdeconnectd.x86_64
+#sudo dnf install ffmpeg -y
+
+sudo dnf install flatpak-builder -y
+flatpak install     org.freedesktop.Platform/x86_64/20.08     org.freedesktop.Sdk/x86_64/20.08
+
+#--Install vlc and codecs-------------
+sudo dnf install vlc -y
+sudo dnf install gstreamer1-plugins-{bad-\*,good-\*,base} gstreamer1-plugin-openh264 gstreamer1-libav --exclude=gstreamer1-plugins-bad-free-devel -y
+sudo dnf install lame\* --exclude=lame-devel -y
+sudo dnf group upgrade --with-optional Multimedia -y
+
+#--install sublime-------------
+sudo rpm -v --import https://download.sublimetext.com/sublimehq-rpm-pub.gpg
+sudo dnf config-manager --add-repo https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+sudo dnf install sublime-text -y
+
+#--install VSCode-------------
+sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo > /dev/null
+sudo dnf check-update
+sudo dnf install code
+
+#--install codeblocks-------------
+sudo dnf install codeblocks.x86_64 -y
+sudo dnf install codeblocks-contrib.x86_64 -y
+sudo dnf install codeblocks-contrib-devel.x86_64 -y
+sudo dnf install codeblocks-contrib-libs.x86_64 -y
+sudo dnf install codeblocks-devel.x86_64 -y
+sudo dnf install codeblocks-libs.x86_64 -y
+
+sudo flatpak install com.jetbrains.IntelliJ-IDEA-Ultimate -y
+sudo flatpak install com.github.eneshecan.WhatsAppForLinux -y
+sudo flatpak install com.stremio.Stremio -y
+
+
+#--install vmware-------------
+sudo dnf install -y kernel-devel-$(uname -r) kernel-headers -y
+#reboot
+cd ~/Downloads
+sudo chmod 700 VMware-Workstation-Full-*.bundle
+sudo ./VMware-Workstation-Full-*.bundle
+
+VMWARE_VERSION=workstation-16.2.3
+TMP_FOLDER=/tmp/patch-vmware
+rm -fdr $TMP_FOLDER
+mkdir -p $TMP_FOLDER
+cd $TMP_FOLDER
+sudo apt install git -y
+git clone https://github.com/mkubecek/vmware-host-modules.git
+cd $TMP_FOLDER/vmware-host-modules
+git checkout $VMWARE_VERSION
+git fetch
+make
+sudo make install
+sudo rm /usr/lib/vmware/lib/libz.so.1/libz.so.1
+sudo ln -s /lib/x86_64-linux-gnu/libz.so.1 /usr/lib/vmware/lib/libz.so.1/libz.so.1
+
+sudo dnf install -y openssl
+sudo mkdir -p /misc/sign-vmware-modules
+sudo chmod 777 /misc/sign-vmware-modules
+cd /misc/sign-vmware-modules
+openssl req -new -x509 -newkey rsa:2048 -keyout MOK.priv -outform DER -out MOK.der -nodes -days 36500 -subj "/CN=MSI/"
+chmod 600 MOK.priv
+sudo mokutil --import MOK.der
+#sudo nano /misc/sign-vmware-modules/signingscript
+cat <<EOF | sudo tee /misc/sign-vmware-modules/signingscript
+#!/bin/bash
+for modfile in $(modinfo -n vmmon vmnet); do
+  echo "Signing $modfile"
+  /usr/src/kernels/$(uname -r)/scripts/sign-file sha256 \
+                                /misc/sign-vmware-modules/MOK.priv \
+                                /misc/sign-vmware-modules/MOK.der "$modfile"
+done
+EOF
+chmod 700 /misc/sign-vmware-modules/signingscript
+sudo /misc/sign-vmware-modules/signingscript
+# reboot
+#1. Choose Enroll MOK
+#2. Choose View Key 0 to check the Machine Owner Key. If the key is OK, press enter and then select Continue
+#3. Choose Yes to enroll the key(s) and then enter the password you supplied during the import
+#4. Finally, choose Reboot to reboot the system
+#----------------------------
+
+#NAO INICIA POR USB:
+sudo dracut --force --no-hostonly
+
+#-------------------speed up:
+cat <<EOF | sudo tee /etc/dnf/dnf.conf
+[main]
+gpgcheck=True
+installonly_limit=3
+clean_requirements_on_remove=True
+best=False
+skip_if_unavailable=True
+#fastestmirror=true
+max_parallel_downloads=10
+defaultyes=True
+keepcache=True
+EOF
+
+#sudo nano -w /etc/dnf/dnf.conf
+#"
+#fastestmirror=true
+#max_parallel_downloads=10
+#defaultyes=True
+#keepcache=True
+#"
+
